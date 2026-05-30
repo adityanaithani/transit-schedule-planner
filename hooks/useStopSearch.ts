@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { searchStops } from "../lib/transitland";
 import { geocode } from "../lib/geocode";
-import { Stop } from "../types/transit";
 
 export interface SearchResult {
   id: string;
@@ -16,12 +15,12 @@ export function useStopSearch(query: string) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!query || query.length < 3) {
-      setResults([]);
-      return;
-    }
+    const fetchResults = async () => {
+      if (!query || query.length < 3) {
+        setResults([]);
+        return;
+      }
 
-    const handler = setTimeout(async () => {
       setIsLoading(true);
       try {
         // Run both searches in parallel
@@ -68,7 +67,9 @@ export function useStopSearch(query: string) {
       } finally {
         setIsLoading(false);
       }
-    }, 400);
+    };
+
+    const handler = setTimeout(fetchResults, 400);
 
     return () => clearTimeout(handler);
   }, [query]);

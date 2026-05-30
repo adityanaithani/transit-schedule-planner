@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import StopSearch from "./StopSearch";
 import DateTimePicker from "./DateTimePicker";
 import { SearchResult } from "../hooks/useStopSearch";
@@ -15,18 +15,23 @@ export interface SearchParams {
   date: string;
   time: string;
 }
-
 export default function SearchForm({ onSearch }: SearchFormProps) {
   const [origin, setOrigin] = useState<SearchResult | null>(null);
   const [destination, setDestination] = useState<SearchResult | null>(null);
-  
-  // Default to now
-  const now = new Date();
-  const defaultDate = now.toISOString().split("T")[0];
-  const defaultTime = now.toTimeString().split(" ")[0].slice(0, 5);
-  
-  const [date, setDate] = useState(defaultDate);
-  const [time, setTime] = useState(defaultTime);
+  const [mounted, setMounted] = useState(false);
+
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+
+  // Initialize date/time only on the client to prevent hydration mismatches
+  useEffect(() => {
+    const now = new Date();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDate(now.toISOString().split("T")[0]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTime(now.toTimeString().split(" ")[0].slice(0, 5));
+    setMounted(true);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,15 +55,25 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
           onSelect={setOrigin}
           defaultValue={origin?.name}
         />
-        
+
         <div className="flex justify-center -my-2">
           <button
             type="button"
             onClick={swapPlaces}
             className="z-10 rounded-full border border-zinc-200 bg-white p-2 text-zinc-400 shadow-sm transition-all hover:border-yellow-400 hover:text-yellow-600 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:text-yellow-400"
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+              />
             </svg>
           </button>
         </div>
@@ -71,12 +86,16 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
         />
       </div>
 
-      <DateTimePicker
-        date={date}
-        time={time}
-        onDateChange={setDate}
-        onTimeChange={setTime}
-      />
+      {mounted ? (
+        <DateTimePicker
+          date={date}
+          time={time}
+          onDateChange={setDate}
+          onTimeChange={setTime}
+        />
+      ) : (
+        <div className="h-[76px] w-full animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
+      )}
 
       <button
         type="submit"

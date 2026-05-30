@@ -3,12 +3,39 @@ import { Stop, Route, StopTime } from "../types/transit";
 const BASE_URL = "https://transit.land/api/v2/rest";
 const TTC_OPERATOR_ID = "o-dpz8-ttc";
 
+interface TransitlandStop {
+  onestop_id: string;
+  stop_name: string;
+  geometry: {
+    coordinates: [number, number];
+  };
+}
+
+interface TransitlandDeparture {
+  arrival: { scheduled: string };
+  departure: { scheduled: string };
+  trip: {
+    id: number | string;
+    trip_id: string;
+    route: {
+      route_id: string;
+      route_short_name: string;
+      route_long_name: string;
+      route_color: string;
+    };
+  };
+}
+
+/**
+ * Generic fetch wrapper for Transitland API
+ */
 async function fetchFromTransitland<T>(
   endpoint: string,
   params: Record<string, string> = {},
 ): Promise<T> {
   const apiKey = process.env.NEXT_PUBLIC_TRANSITLAND_API_KEY;
   if (!apiKey) {
+    console.error("fetchFromTransitland: API key is MISSING in environment variables!");
     throw new Error("API key not set in env.");
   }
 
@@ -25,27 +52,32 @@ async function fetchFromTransitland<T>(
   });
 
   if (!response.ok) {
-    throw new Error(`API error: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Transitland API error: ${response.status} ${response.statusText}`,
+    );
   }
 
   return response.json() as Promise<T>;
 }
 
 /**
- * Find stops near a coordinate within a given radius
+ * Find stops near a coordinate
  */
 export async function getStops(
   lat: number,
   lon: number,
   radiusMeters: number = 500,
 ): Promise<Stop[]> {
-  const data = await fetchFromTransitland<{ stops: any[] }>("/stops", {
-    lat: lat.toString(),
-    lon: lon.toString(),
-    radius: radiusMeters.toString(),
-    served_by_onestop_id: TTC_OPERATOR_ID,
-    limit: "100",
-  });
+  const data = await fetchFromTransitland<{ stops: TransitlandStop[] }>(
+    "/stops",
+    {
+      lat: lat.toString(),
+      lon: lon.toString(),
+      radius: radiusMeters.toString(),
+      served_by_onestop_id: TTC_OPERATOR_ID,
+      limit: "100",
+    },
+  );
 
   return data.stops.map((s) => ({
     id: s.onestop_id,
@@ -59,11 +91,14 @@ export async function getStops(
  * Search for stops by name (autocomplete).
  */
 export async function searchStops(query: string): Promise<Stop[]> {
-  const data = await fetchFromTransitland<{ stops: any[] }>("/stops", {
-    search: query,
-    served_by_onestop_id: TTC_OPERATOR_ID,
-    limit: "10",
-  });
+  const data = await fetchFromTransitland<{ stops: TransitlandStop[] }>(
+    "/stops",
+    {
+      search: query,
+      served_by_onestop_id: TTC_OPERATOR_ID,
+      limit: "10",
+    },
+  );
 
   return data.stops.map((s) => ({
     id: s.onestop_id,
@@ -94,23 +129,9 @@ export async function getStopTimes(
   date: string,
   startTime: string,
 ): Promise<StopTime[]> {
-  // Transitland v2 REST API uses /stops/{id}/departures instead of /stop_times
   const data = await fetchFromTransitland<{
     stops: Array<{
-      departures: Array<{
-        arrival: { scheduled: string };
-        departure: { scheduled: string };
-        trip: {
-          id: any;
-          trip_id: string; // The canonical GTFS trip_id
-          route: {
-            route_id: string;
-            route_short_name: string;
-            route_long_name: string;
-            route_color: string;
-          };
-        };
-      }>;
+      departures: TransitlandDeparture[];
     }>;
   }>(`/stops/${stopId}/departures`, {
     date: date,
@@ -122,13 +143,12 @@ export async function getStopTimes(
     return [];
   }
 
-  // map transitland response to stoptime
   return data.stops[0].departures.map((dep) => ({
     departure_time: dep.departure.scheduled,
     arrival_time: dep.arrival.scheduled,
-    stop: {} as any,
+    stop: {} as any, // eslint-disable-line @typescript-eslint/no-explicit-any
     trip: {
-      id: dep.trip.trip_id || dep.trip.id.toString(), // Prefer GTFS trip_id for cross-stop matching
+      id: dep.trip.trip_id || dep.trip.id.toString(),
       route: {
         id: dep.trip.route.route_id,
         name: dep.trip.route.route_short_name || dep.trip.route.route_long_name,
