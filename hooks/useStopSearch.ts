@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { searchStops } from "../lib/transitland";
 import { geocode } from "../lib/geocode";
 
 export interface SearchResult {
@@ -7,7 +6,7 @@ export interface SearchResult {
   name: string;
   lat: number;
   lon: number;
-  type: "stop" | "address";
+  type: "address";
 }
 
 export function useStopSearch(query: string) {
@@ -23,45 +22,19 @@ export function useStopSearch(query: string) {
 
       setIsLoading(true);
       try {
-        // Run both searches in parallel
-        const [stops, address] = await Promise.all([
-          searchStops(query),
-          geocode(query),
-        ]);
+        const address = await geocode(query);
 
-        const combined: SearchResult[] = [];
-
-        // Add stops first
-        stops.forEach((s) => {
-          combined.push({
-            id: s.id,
-            name: s.name,
-            lat: s.lat,
-            lon: s.lon,
-            type: "stop",
-          });
-        });
-
-        // Add geocode result if it's not already covered by a stop (simplified check)
         if (address) {
-          combined.push({
+          setResults([{
             id: `address-${address.lat}-${address.lon}`,
             name: address.name,
             lat: address.lat,
             lon: address.lon,
             type: "address",
-          });
+          }]);
+        } else {
+          setResults([]);
         }
-
-        // Deduplicate and limit
-        const seen = new Set<string>();
-        const finalResults = combined.filter((r) => {
-          if (seen.has(r.name)) return false;
-          seen.add(r.name);
-          return true;
-        }).slice(0, 8);
-
-        setResults(finalResults);
       } catch (error) {
         console.error("Search failed:", error);
       } finally {
@@ -69,7 +42,7 @@ export function useStopSearch(query: string) {
       }
     };
 
-    const handler = setTimeout(fetchResults, 400);
+    const handler = setTimeout(fetchResults, 600);
 
     return () => clearTimeout(handler);
   }, [query]);

@@ -71,21 +71,19 @@ export default function StopSearch({
                     className="flex w-full items-start gap-3 p-4 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
                   >
                     <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center">
-                      {result.type === "stop" ? (
-                        <div className="h-2 w-2 rounded-full bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]" />
-                      ) : (
-                        <svg className="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
+                        <svg className="h-3 w-3 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                      )}
+                      </div>
                     </div>
                     <div>
                       <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 line-clamp-1">
                         {result.name}
                       </div>
                       <div className="text-xs text-zinc-500">
-                        {result.type === "stop" ? "TTC Stop" : "Address"}
+                        Location
                       </div>
                     </div>
                   </button>

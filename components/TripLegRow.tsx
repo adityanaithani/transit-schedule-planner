@@ -34,29 +34,29 @@ export default function TripLegRow({ leg, isLast }: TripLegRowProps) {
         </div>
 
         <div className="mt-2 flex flex-col gap-2 rounded-xl border border-zinc-100 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               {leg.type === "transit" ? (
                 <>
                   <RouteBadge name={leg.route?.name || "???"} color={leg.route?.color} />
-                  <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  <span className="text-sm font-medium text-zinc-700 line-clamp-2 dark:text-zinc-300">
                     Take {leg.route?.name}
                   </span>
                 </>
               ) : (
                 <>
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
                     <svg className="h-3 w-3 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                     </svg>
                   </div>
-                  <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  <span className="text-sm font-medium text-zinc-700 line-clamp-2 dark:text-zinc-300">
                     Walk to {leg.to.name}
                   </span>
                 </>
               )}
             </div>
-            <span className="text-xs text-zinc-400">{leg.durationMinutes} min</span>
+            <span className="shrink-0 whitespace-nowrap text-xs text-zinc-400">{leg.durationMinutes} min</span>
           </div>
         </div>
         
