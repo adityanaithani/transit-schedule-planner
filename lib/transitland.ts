@@ -56,6 +56,24 @@ export async function getStops(
 }
 
 /**
+ * Search for stops by name (autocomplete).
+ */
+export async function searchStops(query: string): Promise<Stop[]> {
+  const data = await fetchFromTransitland<{ stops: any[] }>("/stops", {
+    search: query,
+    served_by_onestop_id: TTC_OPERATOR_ID,
+    limit: "10",
+  });
+
+  return data.stops.map((s) => ({
+    id: s.onestop_id,
+    name: s.stop_name,
+    lat: s.geometry.coordinates[1],
+    lon: s.geometry.coordinates[0],
+  }));
+}
+
+/**
  * Find all TTC routes
  */
 export async function getRoutes(): Promise<Route[]> {
