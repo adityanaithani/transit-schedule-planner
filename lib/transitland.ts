@@ -3,9 +3,6 @@ import { Stop, Route, StopTime } from "../types/transit";
 const BASE_URL = "https://transit.land/api/v2/rest";
 const TTC_OPERATOR_ID = "o-dpz8-ttc";
 
-/**
- * Generic fetch wrapper for Transitland API
- */
 async function fetchFromTransitland<T>(
   endpoint: string,
   params: Record<string, string> = {},
@@ -28,16 +25,14 @@ async function fetchFromTransitland<T>(
   });
 
   if (!response.ok) {
-    throw new Error(
-      `Transitland API error: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
   }
 
   return response.json() as Promise<T>;
 }
 
 /**
- * Find stops near a coordinate
+ * Find stops near a coordinate within a given radius
  */
 export async function getStops(
   lat: number,
@@ -53,7 +48,7 @@ export async function getStops(
   });
 
   return data.stops.map((s) => ({
-    id: s.onestop_id, // Use onestop_id as the primary key for departure queries
+    id: s.onestop_id,
     name: s.stop_name,
     lat: s.geometry.coordinates[1],
     lon: s.geometry.coordinates[0],
@@ -102,24 +97,26 @@ export async function getStopTimes(
   }>(`/stops/${stopId}/departures`, {
     date: date,
     start_time: startTime,
-    next: "3", 
+    next: "3",
   });
 
   if (!data.stops || data.stops.length === 0 || !data.stops[0].departures) {
     return [];
   }
 
-  // Map the Transitland response to our internal StopTime interface
+  // map transitland response to stoptime
   return data.stops[0].departures.map((dep) => ({
     departure_time: dep.departure.scheduled,
     arrival_time: dep.arrival.scheduled,
-    stop: {} as any, 
+    stop: {} as any,
     trip: {
       id: dep.trip.trip_id || dep.trip.id.toString(), // Prefer GTFS trip_id for cross-stop matching
       route: {
         id: dep.trip.route.route_id,
         name: dep.trip.route.route_short_name || dep.trip.route.route_long_name,
-        color: dep.trip.route.route_color ? `#${dep.trip.route.route_color}` : "#E32636",
+        color: dep.trip.route.route_color
+          ? `#${dep.trip.route.route_color}`
+          : "#E32636",
         operator: { name: "TTC" },
       },
     },

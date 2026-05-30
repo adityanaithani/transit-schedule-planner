@@ -1,7 +1,7 @@
 export async function geocode(
   query: string,
 ): Promise<{ lat: number; lon: number; name: string } | null> {
-  // Ensure we are scoping the search to Toronto, ON to improve accuracy
+  // pre-scope to toronto
   const scopedQuery = `${query}, Toronto, ON, Canada`;
 
   const url = new URL("https://nominatim.openstreetmap.org/search");
@@ -25,7 +25,7 @@ export async function geocode(
     const data = await response.json();
 
     if (!data || data.length === 0) {
-      return null; // No results found
+      return null;
     }
 
     const firstResult = data[0];
