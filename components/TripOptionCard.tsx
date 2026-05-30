@@ -4,9 +4,11 @@ import RouteBadge from "./RouteBadge";
 
 interface TripOptionCardProps {
   trip: TripOption;
+  isSaved?: boolean;
+  onSave?: () => void;
 }
 
-export default function TripOptionCard({ trip }: TripOptionCardProps) {
+export default function TripOptionCard({ trip, isSaved, onSave }: TripOptionCardProps) {
   const formatTime = (isoString: string) => {
     return new Date(isoString).toLocaleTimeString([], {
       hour: "2-digit",
@@ -73,11 +75,25 @@ export default function TripOptionCard({ trip }: TripOptionCardProps) {
 
       {/* Footer Actions */}
       <div className="flex items-center justify-between border-t border-zinc-100 px-6 py-4 dark:border-zinc-800">
-        <button className="flex items-center gap-2 text-sm font-semibold text-yellow-600 transition-colors hover:text-yellow-700 dark:text-yellow-400">
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-          </svg>
-          Save Trip
+        <button 
+          onClick={onSave}
+          disabled={isSaved}
+          className={`flex items-center gap-2 text-sm font-semibold transition-colors ${
+            isSaved 
+              ? "text-zinc-400 cursor-not-allowed dark:text-zinc-600" 
+              : "text-yellow-600 hover:text-yellow-700 dark:text-yellow-400 dark:hover:text-yellow-300"
+          }`}
+        >
+          {isSaved ? (
+            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+            </svg>
+          ) : (
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+          )}
+          {isSaved ? "Saved" : "Save Trip"}
         </button>
         <button className="flex items-center gap-2 text-sm font-semibold text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-white">
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -1,13 +1,24 @@
 import { TripOption } from "../types/transit";
 import TripOptionCard from "./TripOptionCard";
+import { SearchParams } from "./SearchForm";
 
 interface TripResultsProps {
   trips: TripOption[];
   isLoading: boolean;
   error: string | null;
+  params: SearchParams | null;
+  onSaveTrip: (trip: TripOption, params: SearchParams) => void;
+  isTripSaved: (tripId: string) => boolean;
 }
 
-export default function TripResults({ trips, isLoading, error }: TripResultsProps) {
+export default function TripResults({ 
+  trips, 
+  isLoading, 
+  error, 
+  params,
+  onSaveTrip,
+  isTripSaved
+}: TripResultsProps) {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-6">
@@ -38,7 +49,14 @@ export default function TripResults({ trips, isLoading, error }: TripResultsProp
   return (
     <div className="flex flex-col gap-6 pb-20">
       {trips.map((trip) => (
-        <TripOptionCard key={trip.id} trip={trip} />
+        <TripOptionCard 
+          key={trip.id} 
+          trip={trip} 
+          isSaved={isTripSaved(trip.id)}
+          onSave={() => {
+            if (params) onSaveTrip(trip, params);
+          }}
+        />
       ))}
     </div>
   );

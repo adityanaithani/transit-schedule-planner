@@ -28,7 +28,7 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
     const now = new Date();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDate(now.toISOString().split("T")[0]);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setTime(now.toTimeString().split(" ")[0].slice(0, 5));
     setMounted(true);
   }, []);

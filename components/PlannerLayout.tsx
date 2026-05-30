@@ -3,14 +3,16 @@
 import { useState } from "react";
 import SearchForm, { SearchParams } from "./SearchForm";
 import TripResults from "./TripResults";
+import SavedTripsSidebar from "./SavedTripsSidebar";
 import { useTripSearch } from "../hooks/useTripSearch";
+import { useSavedTrips } from "../hooks/useSavedTrips";
 
 export default function PlannerLayout() {
   const [searchParams, setSearchParams] = useState<SearchParams | null>(null);
   const { trips, isLoading, error } = useTripSearch(searchParams);
+  const { savedTrips, saveTrip, deleteTrip, isTripSaved } = useSavedTrips();
 
   const handleSearch = (params: SearchParams) => {
-    console.log("Form submitted with params:", JSON.stringify(params, null, 2));
     setSearchParams(params);
   };
 
@@ -26,6 +28,8 @@ export default function PlannerLayout() {
         </div>
 
         <SearchForm onSearch={handleSearch} />
+        
+        <SavedTripsSidebar savedTrips={savedTrips} onDelete={deleteTrip} />
 
         <div className="mt-12 text-xs text-zinc-400">
           <p>© 2026 Transit Schedule Planner</p>
@@ -89,7 +93,14 @@ export default function PlannerLayout() {
               </div>
             </div>
 
-            <TripResults trips={trips} isLoading={isLoading} error={error} />
+            <TripResults 
+              trips={trips} 
+              isLoading={isLoading} 
+              error={error} 
+              params={searchParams}
+              onSaveTrip={saveTrip}
+              isTripSaved={isTripSaved}
+            />
           </div>
         )}
       </main>
