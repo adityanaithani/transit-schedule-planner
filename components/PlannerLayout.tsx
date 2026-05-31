@@ -1,16 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SearchForm, { SearchParams } from "./SearchForm";
 import TripResults from "./TripResults";
 import SavedTripsSidebar from "./SavedTripsSidebar";
 import { useTripSearch } from "../hooks/useTripSearch";
 import { useSavedTrips } from "../hooks/useSavedTrips";
 
-export default function PlannerLayout() {
-  const [searchParams, setSearchParams] = useState<SearchParams | null>(null);
+interface PlannerLayoutProps {
+  initialParams?: SearchParams | null;
+}
+
+export default function PlannerLayout({ initialParams }: PlannerLayoutProps) {
+  const [searchParams, setSearchParams] = useState<SearchParams | null>(initialParams || null);
   const { trips, isLoading, error } = useTripSearch(searchParams);
   const { savedTrips, saveTrip, deleteTrip, isTripSaved } = useSavedTrips();
+
+  // If initialParams change (e.g. navigation), update the state
+  useEffect(() => {
+    if (initialParams) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSearchParams(initialParams);
+    }
+  }, [initialParams]);
 
   const handleSearch = (params: SearchParams) => {
     setSearchParams(params);
@@ -18,7 +30,7 @@ export default function PlannerLayout() {
 
   return (
     <div className="flex min-h-screen w-full flex-col lg:flex-row">
-      {/* Sidebar: Form */}
+      {/* Sidebar: Form & Saved Trips */}
       <aside className="w-full border-b border-zinc-200 bg-white p-6 lg:h-screen lg:w-96 lg:overflow-y-auto lg:border-b-0 lg:border-r dark:border-zinc-800 dark:bg-black">
         <div className="mb-8">
           <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white">
@@ -27,7 +39,7 @@ export default function PlannerLayout() {
           <p className="text-sm text-zinc-500">Plan future TTC trips</p>
         </div>
 
-        <SearchForm onSearch={handleSearch} />
+        <SearchForm onSearch={handleSearch} initialParams={initialParams} />
         
         <SavedTripsSidebar savedTrips={savedTrips} onDelete={deleteTrip} />
 

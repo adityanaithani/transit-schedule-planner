@@ -21,6 +21,12 @@ export default function StopSearch({
   const { results, isLoading } = useStopSearch(query);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
+  // Sync internal query state when the defaultValue prop changes from outside (e.g. swap button)
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setQuery(defaultValue);
+  }, [defaultValue]);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
@@ -38,7 +44,7 @@ export default function StopSearch({
   };
 
   return (
-    <div className="relative w-full" ref={wrapperRef}>
+    <div className={`relative w-full ${isOpen ? "z-50" : "z-0"}`} ref={wrapperRef}>
       <label className="mb-1 block text-sm font-medium text-zinc-500 dark:text-zinc-400">
         {label}
       </label>

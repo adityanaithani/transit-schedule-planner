@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import StopSearch from "./StopSearch";
 import DateTimePicker from "./DateTimePicker";
 import { SearchResult } from "../hooks/useStopSearch";
-
 interface SearchFormProps {
   onSearch: (params: SearchParams) => void;
+  initialParams?: SearchParams | null;
 }
 
 export interface SearchParams {
@@ -15,23 +15,33 @@ export interface SearchParams {
   date: string;
   time: string;
 }
-export default function SearchForm({ onSearch }: SearchFormProps) {
-  const [origin, setOrigin] = useState<SearchResult | null>(null);
-  const [destination, setDestination] = useState<SearchResult | null>(null);
+
+export default function SearchForm({
+  onSearch,
+  initialParams,
+}: SearchFormProps) {
+  const [origin, setOrigin] = useState<SearchResult | null>(
+    initialParams?.origin || null,
+  );
+  const [destination, setDestination] = useState<SearchResult | null>(
+    initialParams?.destination || null,
+  );
   const [mounted, setMounted] = useState(false);
 
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
+  const [date, setDate] = useState(initialParams?.date || "");
+  const [time, setTime] = useState(initialParams?.time || "");
 
   // Initialize date/time only on the client to prevent hydration mismatches
   useEffect(() => {
-    const now = new Date();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setDate(now.toISOString().split("T")[0]);
-     
-    setTime(now.toTimeString().split(" ")[0].slice(0, 5));
+    if (!initialParams?.date || !initialParams?.time) {
+      const now = new Date();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDate(now.toISOString().split("T")[0]);
+
+      setTime(now.toTimeString().split(" ")[0].slice(0, 5));
+    }
     setMounted(true);
-  }, []);
+  }, [initialParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,7 +104,7 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
           onTimeChange={setTime}
         />
       ) : (
-        <div className="h-[76px] w-full animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
+        <div className="h-19 w-full animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
       )}
 
       <button

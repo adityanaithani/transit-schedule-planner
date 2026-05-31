@@ -27,8 +27,8 @@ export async function planTrip(
   const startTime = time.length === 5 ? `${time}:00` : time;
 
   const [originStops, destStops] = await Promise.all([
-    getStops(originLat, originLon, 500),
-    getStops(destLat, destLon, 500),
+    getStops(originLat, originLon, 250),
+    getStops(destLat, destLon, 250),
   ]);
 
   if (originStops.length === 0 || destStops.length === 0) {
