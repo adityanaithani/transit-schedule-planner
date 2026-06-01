@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { searchStops } from "../lib/transitland";
 import { geocode } from "../lib/geocode";
 
 export interface SearchResult {
@@ -6,7 +7,7 @@ export interface SearchResult {
   name: string;
   lat: number;
   lon: number;
-  type: "address";
+  type: "address" | "stop";
 }
 
 export function useStopSearch(query: string) {
@@ -22,19 +23,41 @@ export function useStopSearch(query: string) {
 
       setIsLoading(true);
       try {
-        const address = await geocode(query);
+        const [stops, address] = await Promise.all([
+          searchStops(query).catch(() => []),
+          geocode(query).catch(() => null),
+        ]);
+
+        const combined: SearchResult[] = [];
 
         if (address) {
-          setResults([{
+          combined.push({
             id: `address-${address.lat}-${address.lon}`,
             name: address.name,
             lat: address.lat,
             lon: address.lon,
             type: "address",
-          }]);
-        } else {
-          setResults([]);
+          });
         }
+
+        // Add transit stops, but deduplicate identical coordinates/names
+        const seenNames = new Set<string>();
+        if (address) seenNames.add(address.name);
+
+        stops.forEach((s) => {
+          if (!seenNames.has(s.name)) {
+            seenNames.add(s.name);
+            combined.push({
+              id: s.id,
+              name: s.name,
+              lat: s.lat,
+              lon: s.lon,
+              type: "stop",
+            });
+          }
+        });
+
+        setResults(combined.slice(0, 8));
       } catch (error) {
         console.error("Search failed:", error);
       } finally {
@@ -42,7 +65,7 @@ export function useStopSearch(query: string) {
       }
     };
 
-    const handler = setTimeout(fetchResults, 600);
+    const handler = setTimeout(fetchResults, 400);
 
     return () => clearTimeout(handler);
   }, [query]);

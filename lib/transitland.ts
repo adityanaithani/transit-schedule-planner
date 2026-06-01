@@ -74,7 +74,6 @@ export async function getStops(
       lat: lat.toString(),
       lon: lon.toString(),
       radius: radiusMeters.toString(),
-      served_by_onestop_id: TTC_OPERATOR_ID,
       limit: "100",
     },
   );

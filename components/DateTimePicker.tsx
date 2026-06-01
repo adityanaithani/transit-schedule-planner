@@ -28,7 +28,7 @@ export default function DateTimePicker({
       </div>
       <div className="flex-1">
         <label className="mb-1 block text-sm font-medium text-zinc-500 dark:text-zinc-400">
-          Time
+          Leave At
         </label>
         <input
           type="time"

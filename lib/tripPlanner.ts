@@ -21,14 +21,17 @@ export async function planTrip(
   originLon: number,
   destLat: number,
   destLon: number,
-  date: string,
-  time: string,
+  date: string, // YYYY-MM-DD
+  time: string  // HH:MM (will append :00)
 ): Promise<TripOption[]> {
   const startTime = time.length === 5 ? `${time}:00` : time;
 
+  // 1. Find nearby stops
+  // Using a 600m radius to ensure we catch bus/streetcar stops if Nominatim geocodes 
+  // the intersection slightly off-center.
   const [originStops, destStops] = await Promise.all([
-    getStops(originLat, originLon, 250),
-    getStops(destLat, destLon, 250),
+    getStops(originLat, originLon, 600),
+    getStops(destLat, destLon, 600),
   ]);
 
   if (originStops.length === 0 || destStops.length === 0) {
