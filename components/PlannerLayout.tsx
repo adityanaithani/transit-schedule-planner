@@ -12,7 +12,9 @@ interface PlannerLayoutProps {
 }
 
 export default function PlannerLayout({ initialParams }: PlannerLayoutProps) {
-  const [searchParams, setSearchParams] = useState<SearchParams | null>(initialParams || null);
+  const [searchParams, setSearchParams] = useState<SearchParams | null>(
+    initialParams || null,
+  );
   const { trips, isLoading, error } = useTripSearch(searchParams);
   const { savedTrips, saveTrip, deleteTrip, isTripSaved } = useSavedTrips();
 
@@ -34,17 +36,17 @@ export default function PlannerLayout({ initialParams }: PlannerLayoutProps) {
       <aside className="w-full border-b border-zinc-200 bg-white p-6 lg:h-screen lg:w-96 lg:overflow-y-auto lg:border-b-0 lg:border-r dark:border-zinc-800 dark:bg-black">
         <div className="mb-8">
           <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white">
-            TTC <span className="text-yellow-400">PLANNER</span>
+            Head<span className="text-yellow-400">way</span>
           </h1>
           <p className="text-sm text-zinc-500">Plan future TTC trips</p>
         </div>
 
         <SearchForm onSearch={handleSearch} initialParams={initialParams} />
-        
+
         <SavedTripsSidebar savedTrips={savedTrips} onDelete={deleteTrip} />
 
         <div className="mt-12 text-xs text-zinc-400">
-          <p>© 2026 Transit Schedule Planner</p>
+          <p>© 2026 Headway</p>
           <p className="mt-1">Data from Transitland & OpenStreetMap</p>
         </div>
       </aside>
@@ -105,10 +107,10 @@ export default function PlannerLayout({ initialParams }: PlannerLayoutProps) {
               </div>
             </div>
 
-            <TripResults 
-              trips={trips} 
-              isLoading={isLoading} 
-              error={error} 
+            <TripResults
+              trips={trips}
+              isLoading={isLoading}
+              error={error}
               params={searchParams}
               onSaveTrip={saveTrip}
               isTripSaved={isTripSaved}

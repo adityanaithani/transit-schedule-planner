@@ -18,12 +18,6 @@ export function useTripSearch(params: SearchParams | null) {
       setIsLoading(true);
       setError(null);
       try {
-        console.log("useTripSearch: Calling planTrip with", {
-          lat1: params.origin!.lat, lon1: params.origin!.lon,
-          lat2: params.destination!.lat, lon2: params.destination!.lon,
-          date: params.date, time: params.time
-        });
-        
         const results = await planTrip(
           params.origin!.lat,
           params.origin!.lon,
@@ -33,14 +27,12 @@ export function useTripSearch(params: SearchParams | null) {
           params.time
         );
         
-        console.log("useTripSearch: planTrip returned", results.length, "results");
-        
         setTrips(results);
         if (results.length === 0) {
           setError("No direct routes found between these locations.");
         }
       } catch (err) {
-        console.error("useTripSearch: Catch block hit - error:", err);
+        console.error("Trip search error:", err);
         setError("Failed to fetch trip options. Please try again.");
       } finally {
         setIsLoading(false);
