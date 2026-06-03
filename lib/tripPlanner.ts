@@ -10,10 +10,23 @@ function timeToMinutes(timeStr: string): number {
   return hours * 60 + minutes + Math.round((seconds || 0) / 60);
 }
 
-function formatTime(minutes: number): string {
-  const hrs = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:00`;
+function constructIsoDateTime(baseDateStr: string, minutesSinceMidnight: number): string {
+  const daysToAdd = Math.floor(minutesSinceMidnight / (24 * 60));
+  const hours = Math.floor((minutesSinceMidnight % (24 * 60)) / 60);
+  const minutes = minutesSinceMidnight % 60;
+  
+  const [year, month, day] = baseDateStr.split("-").map(Number);
+  // JS Date automatically handles rolling over to the next month/year if day exceeds the month length
+  const jsDate = new Date(year, month - 1, day + daysToAdd);
+  
+  const outYear = jsDate.getFullYear();
+  const outMonth = (jsDate.getMonth() + 1).toString().padStart(2, "0");
+  const outDay = jsDate.getDate().toString().padStart(2, "0");
+  
+  const outHour = hours.toString().padStart(2, "0");
+  const outMin = minutes.toString().padStart(2, "0");
+  
+  return `${outYear}-${outMonth}-${outDay}T${outHour}:${outMin}:00`;
 }
 
 export async function planTrip(
@@ -75,7 +88,7 @@ export async function planTrip(
   for (const originDep of allOriginDepartures) {
     const matchingDestArr = destArrivalsByTripId.get(originDep.trip.id);
 
-    if (matchingDestArr) {
+    if (matchingDestArr && originDep.departure_time && matchingDestArr.arrival_time) {
       // Validate direction - arrival must be after departure
       const depMins = timeToMinutes(originDep.departure_time);
       const arrMins = timeToMinutes(matchingDestArr.arrival_time);
@@ -88,8 +101,8 @@ export async function planTrip(
           walkToOriginMins + transitDuration + walkFromDestMins;
 
         // Construct ISO datetimes for departure/arrival
-        const tripDepartureTime = `${date}T${formatTime(depMins - walkToOriginMins)}`;
-        const tripArrivalTime = `${date}T${formatTime(arrMins + walkFromDestMins)}`;
+        const tripDepartureTime = constructIsoDateTime(date, depMins - walkToOriginMins);
+        const tripArrivalTime = constructIsoDateTime(date, arrMins + walkFromDestMins);
 
         // Origin walk leg
         const originWalkLeg: TripLeg = {
@@ -102,7 +115,7 @@ export async function planTrip(
           },
           to: originDep.stop,
           departure: tripDepartureTime,
-          arrival: `${date}T${originDep.departure_time}`,
+          arrival: constructIsoDateTime(date, depMins),
           durationMinutes: walkToOriginMins,
         };
 
@@ -111,8 +124,8 @@ export async function planTrip(
           type: "transit",
           from: originDep.stop,
           to: matchingDestArr.stop,
-          departure: `${date}T${originDep.departure_time}`,
-          arrival: `${date}T${matchingDestArr.arrival_time}`,
+          departure: constructIsoDateTime(date, depMins),
+          arrival: constructIsoDateTime(date, arrMins),
           route: originDep.trip.route,
           durationMinutes: transitDuration,
         };
@@ -127,7 +140,7 @@ export async function planTrip(
             lat: destLat,
             lon: destLon,
           },
-          departure: `${date}T${matchingDestArr.arrival_time}`,
+          departure: constructIsoDateTime(date, arrMins),
           arrival: tripArrivalTime,
           durationMinutes: walkFromDestMins,
         };

@@ -35,7 +35,9 @@ async function fetchFromTransitland<T>(
 ): Promise<T> {
   const apiKey = process.env.NEXT_PUBLIC_TRANSITLAND_API_KEY;
   if (!apiKey) {
-    console.error("fetchFromTransitland: API key is MISSING in environment variables!");
+    console.error(
+      "fetchFromTransitland: API key is MISSING in environment variables!",
+    );
     throw new Error("API key not set in env.");
   }
 
@@ -135,7 +137,7 @@ export async function getStopTimes(
   }>(`/stops/${stopId}/departures`, {
     date: date,
     start_time: startTime,
-    next: "3",
+    next: "20",
   });
 
   if (!data.stops || data.stops.length === 0 || !data.stops[0].departures) {

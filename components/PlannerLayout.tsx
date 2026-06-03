@@ -16,7 +16,7 @@ export default function PlannerLayout({ initialParams }: PlannerLayoutProps) {
     initialParams || null,
   );
   const { trips, isLoading, error } = useTripSearch(searchParams);
-  const { savedTrips, saveTrip, deleteTrip, isTripSaved } = useSavedTrips();
+  const { savedTrips, saveTrip, deleteTrip, isTripSaved, isLoaded } = useSavedTrips();
 
   // If initialParams change (e.g. navigation), update the state
   useEffect(() => {
@@ -36,14 +36,14 @@ export default function PlannerLayout({ initialParams }: PlannerLayoutProps) {
       <aside className="w-full border-b border-zinc-200 bg-white p-6 lg:h-screen lg:w-96 lg:overflow-y-auto lg:border-b-0 lg:border-r dark:border-zinc-800 dark:bg-black">
         <div className="mb-8">
           <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white">
-            Head<span className="text-yellow-400">way</span>
+            TTC <span className="text-yellow-400">PLANNER</span>
           </h1>
           <p className="text-sm text-zinc-500">Plan future TTC trips</p>
         </div>
 
         <SearchForm onSearch={handleSearch} initialParams={initialParams} />
 
-        <SavedTripsSidebar savedTrips={savedTrips} onDelete={deleteTrip} />
+        <SavedTripsSidebar savedTrips={savedTrips} onDelete={deleteTrip} isLoaded={isLoaded} />
 
         <div className="mt-12 text-xs text-zinc-400">
           <p>© 2026 Headway</p>

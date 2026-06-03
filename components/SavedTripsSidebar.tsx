@@ -4,10 +4,11 @@ import RouteBadge from "./RouteBadge";
 interface SavedTripsSidebarProps {
   savedTrips: SavedTrip[];
   onDelete: (id: string) => void;
+  isLoaded: boolean;
 }
 
-export default function SavedTripsSidebar({ savedTrips, onDelete }: SavedTripsSidebarProps) {
-  if (savedTrips.length === 0) return null;
+export default function SavedTripsSidebar({ savedTrips, onDelete, isLoaded }: SavedTripsSidebarProps) {
+  if (!isLoaded || savedTrips.length === 0) return null;
 
   const formatTime = (isoString: string) => {
     return new Date(isoString).toLocaleTimeString([], {
