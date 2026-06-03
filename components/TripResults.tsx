@@ -56,6 +56,7 @@ export default function TripResults({
           onSave={() => {
             if (params) onSaveTrip(trip, params);
           }}
+          searchParams={params}
         />
       ))}
     </div>

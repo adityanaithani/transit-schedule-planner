@@ -18,10 +18,23 @@ export default function TripLegRow({ leg, isLast }: TripLegRowProps) {
     <div className="relative flex gap-4">
       {/* Timeline indicator */}
       <div className="flex flex-col items-center">
-        <div className={`h-3 w-3 rounded-full border-2 ${
-          leg.type === "walk" ? "border-zinc-300 bg-white" : "border-yellow-400 bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.4)]"
-        }`} />
-        {!isLast && <div className="w-0.5 flex-1 bg-zinc-200 dark:bg-zinc-800" />}
+        <div
+          style={
+            leg.type === "transit" && leg.route?.color
+              ? { backgroundColor: leg.route.color, borderColor: leg.route.color }
+              : {}
+          }
+          className={`h-3 w-3 rounded-full border-2 ${
+            leg.type === "walk"
+              ? "border-zinc-300 bg-white"
+              : !leg.route?.color
+                ? "border-yellow-400 bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.4)]"
+                : "shadow-sm" // Generic shadow for dynamic colors
+          }`}
+        />
+        {!isLast && (
+          <div className="w-0.5 flex-1 bg-zinc-200 dark:bg-zinc-800" />
+        )}
       </div>
 
       {/* Content */}
@@ -38,7 +51,10 @@ export default function TripLegRow({ leg, isLast }: TripLegRowProps) {
             <div className="flex items-center gap-3">
               {leg.type === "transit" ? (
                 <>
-                  <RouteBadge name={leg.route?.name || "???"} color={leg.route?.color} />
+                  <RouteBadge
+                    name={leg.route?.name || "???"}
+                    color={leg.route?.color}
+                  />
                   <span className="text-sm font-medium text-zinc-700 line-clamp-2 dark:text-zinc-300">
                     Take {leg.route?.name}
                   </span>
@@ -46,8 +62,18 @@ export default function TripLegRow({ leg, isLast }: TripLegRowProps) {
               ) : (
                 <>
                   <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-                    <svg className="h-3 w-3 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                    <svg
+                      className="h-3 w-3 text-zinc-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 5l7 7-7 7M5 5l7 7-7 7"
+                      />
                     </svg>
                   </div>
                   <span className="text-sm font-medium text-zinc-700 line-clamp-2 dark:text-zinc-300">
@@ -56,12 +82,14 @@ export default function TripLegRow({ leg, isLast }: TripLegRowProps) {
                 </>
               )}
             </div>
-            <span className="shrink-0 whitespace-nowrap text-xs text-zinc-400">{leg.durationMinutes} min</span>
+            <span className="shrink-0 whitespace-nowrap text-xs text-zinc-400">
+              {leg.durationMinutes} min
+            </span>
           </div>
         </div>
-        
+
         {isLast && (
-           <div className="mt-4 flex items-center gap-2">
+          <div className="mt-4 flex items-center gap-2">
             <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
               {formatTime(leg.arrival)}
             </span>
