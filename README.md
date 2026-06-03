@@ -4,7 +4,7 @@
 
 ## the problem space: nonexistent trip scheduling
 
-I have quite an inconsitent daily schedule.
+I have quite an inconsistent daily schedule.
 An 8AM Monday lecture, 12PM shift Wednesday, and 5PM hangout on Friday means I take a different bus or train almost every morning.
 
 Even though I know days prior where I'm going and when, I have to wait until the moment I leave the house to either open [Transit](https://transitapp.com/) and set up my trip, or pre-plan my trips using the paper schedule from my local transit agency.
