@@ -51,30 +51,36 @@ export async function planTrip(
     return [];
   }
 
-  const originDeparturesPromises = originStops.map(async (stop) => {
-    try {
-      const times = await getStopTimes(stop.id, date, startTime);
-      return times.map((t) => ({ ...t, stop }));
-    } catch (e) {
-      console.warn(`Failed to fetch times for origin stop ${stop.id}`, e);
-      return [];
-    }
-  });
+  // To prevent extremely slow execution and API rate limits, 
+  // slice the stops to only the top 15 closest ones.
+  const limitedOriginStops = originStops.slice(0, 15);
+  const limitedDestStops = destStops.slice(0, 15);
 
-  const destArrivalsPromises = destStops.map(async (stop) => {
-    try {
-      const times = await getStopTimes(stop.id, date, startTime);
-      return times.map((t) => ({ ...t, stop }));
-    } catch (e) {
-      console.warn(`Failed to fetch times for dest stop ${stop.id}`, e);
-      return [];
+  // Helper to fetch in batches to balance rate limiting and concurrency
+  async function fetchTimesInBatches(stops: Stop[], isOrigin: boolean, batchSize = 5) {
+    const results: StopTime[][] = [];
+    for (let i = 0; i < stops.length; i += batchSize) {
+      const batch = stops.slice(i, i + batchSize);
+      const batchPromises = batch.map(async (stop) => {
+        try {
+          const times = await getStopTimes(stop.id, date, startTime);
+          return times.map((t) => ({ ...t, stop }));
+        } catch (e) {
+          console.warn(`Failed to fetch times for ${isOrigin ? 'origin' : 'dest'} stop ${stop.id}`, e);
+          return [];
+        }
+      });
+      const batchResults = await Promise.all(batchPromises);
+      results.push(...batchResults);
     }
-  });
+    return results;
+  }
 
-  const allOriginDepartures = (
-    await Promise.all(originDeparturesPromises)
-  ).flat();
-  const allDestArrivals = (await Promise.all(destArrivalsPromises)).flat();
+  const originDeparturesPromises = await fetchTimesInBatches(limitedOriginStops, true);
+  const destArrivalsPromises = await fetchTimesInBatches(limitedDestStops, false);
+
+  const allOriginDepartures = originDeparturesPromises.flat();
+  const allDestArrivals = destArrivalsPromises.flat();
 
   const tripOptions: TripOption[] = [];
 
