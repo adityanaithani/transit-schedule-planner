@@ -52,9 +52,10 @@ export async function planTrip(
   }
 
   // To prevent extremely slow execution and API rate limits, 
-  // slice the stops to only the top 15 closest ones.
-  const limitedOriginStops = originStops.slice(0, 15);
-  const limitedDestStops = destStops.slice(0, 15);
+  // slice the stops. We need at least 40 to ensure subway platforms in dense 
+  // hubs like Union Station are not accidentally discarded.
+  const limitedOriginStops = originStops.slice(0, 40);
+  const limitedDestStops = destStops.slice(0, 40);
 
   // Helper to fetch in batches to balance rate limiting and concurrency
   async function fetchTimesInBatches(stops: Stop[], isOrigin: boolean, batchSize = 5) {
