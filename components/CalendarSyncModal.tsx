@@ -159,20 +159,20 @@ export default function CalendarSyncModal({
               type="text"
               value={homeBase}
               onChange={(e) => setHomeBase(e.target.value)}
-              placeholder="e.g. 100 Queen St W"
+              placeholder=""
               className="w-full rounded-lg border border-zinc-200 bg-white p-3 text-sm outline-none focus:border-yellow-400 dark:border-zinc-800 dark:bg-zinc-900 dark:text-white"
             />
           </div>
 
           <div>
             <label className="mb-1 block text-sm font-medium text-zinc-500 dark:text-zinc-400">
-              WebCal ICS Link
+              ICS Web Link
             </label>
             <input
               type="url"
               value={icsUrl}
               onChange={(e) => setIcsUrl(e.target.value)}
-              placeholder="https://..."
+              placeholder=""
               className="w-full rounded-lg border border-zinc-200 bg-white p-3 text-sm outline-none focus:border-yellow-400 dark:border-zinc-800 dark:bg-zinc-900 dark:text-white"
             />
           </div>
@@ -207,7 +207,7 @@ export default function CalendarSyncModal({
             disabled={isLoading || !homeBase || !icsUrl}
             className="w-full rounded-xl bg-yellow-400 py-3 text-center font-bold text-zinc-900 transition-all hover:bg-yellow-500 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400 dark:disabled:bg-zinc-800"
           >
-            {isLoading ? "Syncing..." : "Sync via Link"}
+            {isLoading ? "Syncing..." : "Sync"}
           </button>
         </div>
       </div>

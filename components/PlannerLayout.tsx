@@ -35,19 +35,29 @@ export default function PlannerLayout({ initialParams }: PlannerLayoutProps) {
 
   return (
     <div className="flex min-h-screen w-full flex-col lg:flex-row">
-      {/* Sidebar: Form & Saved Trips */}
+      {/*Sidebar*/}
       <aside className="w-full border-b border-zinc-200 bg-white p-6 lg:h-screen lg:w-96 lg:overflow-y-auto lg:border-b-0 lg:border-r dark:border-zinc-800 dark:bg-black">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white">
-            Head<span className="text-yellow-400">way</span>
+            <span className="font-mono">headway.</span>
           </h1>
-          <button 
+          <button
             onClick={() => setIsCalendarModalOpen(true)}
             className="flex items-center justify-center rounded-full bg-zinc-100 p-2 text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-900 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
             title="Sync Calendar"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
           </button>
         </div>
@@ -86,11 +96,10 @@ export default function PlannerLayout({ initialParams }: PlannerLayoutProps) {
               </svg>
             </div>
             <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
-              Plan your next trip
+              Enter origin and destination to see upcoming routes...
             </h2>
             <p className="mt-2 text-zinc-500 max-w-xs">
-              Enter an origin and destination to see upcoming scheduled TTC
-              routes.
+              ...or schedule your whole calendar at once!
             </p>
           </div>
         ) : (
@@ -122,10 +131,10 @@ export default function PlannerLayout({ initialParams }: PlannerLayoutProps) {
               </div>
             </div>
 
-            <TripResults 
-              trips={trips} 
-              isLoading={isLoading} 
-              error={error} 
+            <TripResults
+              trips={trips}
+              isLoading={isLoading}
+              error={error}
               params={searchParams}
               onSaveTrip={saveTrip}
               isTripSaved={isTripSaved}
@@ -135,9 +144,9 @@ export default function PlannerLayout({ initialParams }: PlannerLayoutProps) {
       </main>
 
       {isCalendarModalOpen && (
-        <CalendarSyncModal 
-          onClose={() => setIsCalendarModalOpen(false)} 
-          onSaveTrip={saveTrip} 
+        <CalendarSyncModal
+          onClose={() => setIsCalendarModalOpen(false)}
+          onSaveTrip={saveTrip}
         />
       )}
     </div>

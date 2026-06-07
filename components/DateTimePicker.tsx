@@ -17,7 +17,7 @@ export default function DateTimePicker({
     <div className="flex w-full gap-4">
       <div className="flex-1">
         <label className="mb-1 block text-sm font-medium text-zinc-500 dark:text-zinc-400">
-          Departure Date
+          Leave on
         </label>
         <input
           type="date"
@@ -28,7 +28,7 @@ export default function DateTimePicker({
       </div>
       <div className="flex-1">
         <label className="mb-1 block text-sm font-medium text-zinc-500 dark:text-zinc-400">
-          Leave At
+          Leave at
         </label>
         <input
           type="time"

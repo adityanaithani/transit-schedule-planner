@@ -61,7 +61,7 @@ export default function SearchForm({
       <div className="relative space-y-4">
         <StopSearch
           label="Where from?"
-          placeholder="Enter origin stop or address..."
+          placeholder="Origin stop or address..."
           onSelect={setOrigin}
           defaultValue={origin?.name}
         />
@@ -90,7 +90,7 @@ export default function SearchForm({
 
         <StopSearch
           label="Where to?"
-          placeholder="Enter destination stop or address..."
+          placeholder="Destination stop or address..."
           onSelect={setDestination}
           defaultValue={destination?.name}
         />
